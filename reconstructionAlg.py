@@ -158,16 +158,13 @@ def draw_snippet_picture(pmt_position_class, snippet_array, muon_points, snippet
         print("Nothing to print")
 
 
-def contour_data_reader(pmt_position_class, snippet_array, number_contour_level):
+def contour_data_reader_old(pmt_position_class, snippet_array, number_contour_level):
     statusAlert.processStatus("Collect contour data")
     ax = plt.subplot(111, projection='aitoff')
 
     phi_i = np.linspace(-math.pi, math.pi, 1200)
     theta_i = np.linspace(-math.pi / 2, math.pi / 2, 600)
-    # zi = plt.mlab.griddata(pmt_position_class.phi_position, pmt_position_class.theta_position,
-    #                        snippet_array, phi_i, theta_i, interp='linear')
-
-    zi = plt.mlab.griddata(pmt_position_class.phi_position, pmt_position_class.theta_position2,
+    zi = plt.mlab.griddata(pmt_position_class.phi_position, pmt_position_class.theta_position,
                            snippet_array, phi_i, theta_i, interp='linear')
     zi = gaussian_filter(zi, 5)
 
@@ -176,6 +173,37 @@ def contour_data_reader(pmt_position_class, snippet_array, number_contour_level)
     contour_data = contour_analyze.get_contour_data(cont_plot_axes)
 
     return contour_data
+
+
+def contour_data_reader(pmt_position_class, snippet_array, number_contour_level, axis=None):
+    statusAlert.processStatus("Collect contour data")
+    ax = plt.subplot(111, projection='aitoff')
+
+    phi_i = np.linspace(-math.pi, math.pi, 1200)
+    theta_i = np.linspace(-math.pi / 2, math.pi / 2, 600)
+
+    if axis is "Phi":
+        phi_origin = pmt_position_class.phi_shifted
+        theta_origin = pmt_position_class.theta_position2
+
+    elif axis is "Theta":
+        phi_origin = pmt_position_class.phi_position
+        theta_origin = pmt_position_class.theta_shifted
+    else:
+        phi_origin = pmt_position_class.phi_position
+        theta_origin = pmt_position_class.theta_position2
+
+    zi = plt.mlab.griddata(phi_origin, theta_origin, snippet_array, phi_i, theta_i, interp='linear')
+    zi = gaussian_filter(zi, 5)
+
+    statusAlert.processStatus("Making contours")
+    cont_plot_axes = ax.contour(phi_i, theta_i, zi, number_contour_level)
+
+    contour_data = contour_analyze.get_contour_data(cont_plot_axes)
+
+    return contour_data
+
+
 
 
 def draw_snippet_contour_plot(pmt_position_class, snippet_array, muon_points,

@@ -188,7 +188,7 @@ def is_muon_stopping(muon_event):
         return True
 
 
-def create_output_path(outpath, file, extension,  inpath):
+def create_output_path(outpath, file, extension, inpath):
     try:
         os.chdir(outpath)
     except:

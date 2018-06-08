@@ -18,6 +18,7 @@ class ContourDataSinglePatch:
 def get_contour_data(contour_output):
     """creates an array in which the contour data per level is stored for a given snippet
         returns a 2D-Array per snippet [level][patch]=ContourDataSinglePatch_Class"""
+    statusAlert.processStatus("Reading contour data")
     return_data_total_snippet = []
     for level in range(len(contour_output.levels)):
         """iterates over all contour levels in the snippet"""
@@ -44,17 +45,19 @@ def get_contour_data(contour_output):
     return return_data_total_snippet
 
 
-def collect_contour_data(photons_in_time_window, PmtPositions, number_contour_level):
+def collect_contour_data(photons_in_time_window, PmtPositions, number_contour_level, axis):
     contour_data_array = []
     diff_contour_data_array = []
     for frame, pmt_array in enumerate(photons_in_time_window.time_snippets):
         statusAlert.processStatus("processing snippet: " + str(frame))
-        contour_data_array.append(reconstructionAlg.contour_data_reader(PmtPositions, pmt_array, number_contour_level))
+        contour_data_array.append(reconstructionAlg.contour_data_reader(PmtPositions,
+                                                                        pmt_array,
+                                                                        number_contour_level,
+                                                                        axis))
         if frame > 0:
             snippet_diff = np.asarray(pmt_array) - np.asarray(photons_in_time_window.time_snippets[frame - 1])
             diff_contour_data_array.append(reconstructionAlg.contour_data_reader(PmtPositions, snippet_diff,
-                                                                                 number_contour_level))
-
+                                                                                 number_contour_level, axis))
     return contour_data_array, diff_contour_data_array
 
 
